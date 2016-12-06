@@ -1,0 +1,13 @@
+var config = require("verizon/thingSpace/authentication/config");
+var sessionTokenManager = require("verizon/thingSpace/authentication/SessionTokenManager");
+var client = require("verizon/thingSpace/httpclient");
+var logoutClient = new client.HttpClient();
+var logoutToken = config.get("accessToken");
+var sessionToken = sessionTokenManager.getPersistedTokens().accessToken;
+var logoutParams = {"url":"https://thingspace.verizon.com/api/m2m/v1/session/logout",
+                     "method":"POST",
+                     "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":sessionToken},
+                     "disableParameterEncoding":false,
+                     "encodeHeaders":false
+                    }
+return logoutClient.callApi(logoutParams);

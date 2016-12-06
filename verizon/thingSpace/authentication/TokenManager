@@ -1,0 +1,82 @@
+var cfg = require("verizon/thingSpace/authentication/config");
+var http = require("http"); 
+//This function is the first step of authorization with ThingSpace to use their APIs.
+function getAuthCode(){
+	var requestCodeUrl = cfg.getAuthUrl().url;
+	var cred = cfg.getAuthCred();
+	var username = cred.username;
+	var password = cred.password;
+
+	var requestCode = http.request({"url":requestCodeUrl,
+                     "method":"POST",
+                    "params":{
+                      "username":username,
+                      "password":password,
+                    },
+                     "disableParameterEncoding":false,
+                     "encodeHeaders":false
+                    });
+	if (requestCode.status != "200"){
+  		return {"status":"failure","errorCode":"INVALID_CREDENTIALS","errorDetail":"the username or password are incorrect."};
+	}
+	else if(JSON.parse(requestCode.body)["token"]){
+  		return {"status":"success","code":JSON.parse(requestCode.body)["token"]};
+	}
+	else {
+		return {"status":"failure","errorCode":"INVALID_AUTHENTICATION","errorDetail":"an error occured while fetching the authorization code."};	
+	}
+}
+
+//This function is step two of authorization that returns the access token.
+function getAuthToken(code){
+  var requestCodeUrl = cfg.getAccessTokenUrl().url;
+  var requestAccessToken = http.request({"url":requestCodeUrl,
+                     "method":"GET",
+
+                     "headers":{"Authorization":" Bearer "+code},
+                     "disableParameterEncoding":false,
+                     "encodeHeaders":false
+                    });
+  	if (requestAccessToken.status != "200"){
+  		return {"status":"failure","errorCode":"INVALID_AUTHENTICATION","errorDetail":"an error occured while fetching the access_token."};;
+	}
+	else if(JSON.parse(requestAccessToken.body)){
+  		return {"status":"success","access_token":JSON.parse(requestAccessToken.body)["tokenValue"]};
+	}
+	
+}
+
+//This function returns the session token that will be used to call APIs .
+function getSessionToken(accessToken){
+  var requestSessionUrl = cfg.getSessionUrl().url;
+  var requestSessionToken = http.request({"url":requestSessionUrl,
+                     "method":"POST",
+                     "headers":{"Authorization":" Bearer "+accessToken},
+                     "disableParameterEncoding":false,
+                     "encodeHeaders":false
+                    });
+  	if (requestSessionToken.status != "200"){
+  		return {"status":"failure","errorCode":"INVALID_AUTHENTICATION","errorDetail":"an error occured while fetching the session access_token."};;
+	}
+	else if(JSON.parse(requestSessionToken.body)){
+  		return {"status":"success","access_token":JSON.parse(requestSessionToken.body).sessionToken};
+	}
+	
+}
+//this function expires a session and returns the session token if response is success.
+function logoutToken(sessionToken, accessToken){
+  var requestEndSessionUrl = cfg.getLogoutSessionUrl().url;
+  var requestEndSessionToken = http.request({"url":requestEndSessionUrl,
+                     "method":"POST",
+                     "headers":{"Authorization":" Bearer "+accessToken,"VZ-M2M-Token":sessionToken},
+                     "disableParameterEncoding":false,
+                     "encodeHeaders":false
+                    });
+  	if (requestEndSessionToken.status != "200"){
+  		return {"status":"failure","errorCode":"INVALID_AUTHENTICATION","errorDetail":"an error occured while fetching the session access_token."};;
+	}
+	else if(JSON.parse(requestEndSessionToken.body)){
+      return JSON.parse(requestEndSessionToken.body);
+  		return {"status":"success","access_token":JSON.parse(requestEndSessionToken.body).sessionToken};
+	}
+}

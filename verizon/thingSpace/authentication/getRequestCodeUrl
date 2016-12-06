@@ -1,0 +1,21 @@
+if(!request.parameters.password){
+  return {"status":"failure","errorCode":"REQUIRED_PARAMETER","errorDetail":"password is a required parameter."};
+}
+var cfg = require("verizon/thingSpace/authentication/config");
+var http = require("http"); 
+
+var requestCodeUrl = cfg.getAuthUrl().url;
+var username = cfg.get("username");
+var password = request.parameters.password;
+
+var requestCode = http.request({"url":requestCodeUrl,"method":"POST","params":{"username":username,"password":password},"disableParameterEncoding":false,"encodeHeaders":false});
+if (requestCode.status != "200"){
+  		return {"status":"failure","errorCode":"INVALID_CREDENTIALS","errorDetail":"the username or password are incorrect."};
+}
+else if(JSON.parse(requestCode.body)["token"]){
+  storage.global[cfg.get("app") + "_" + username + "_authCode"] = JSON.parse(requestCode.body)["token"];
+	return {"status":"success","code":JSON.parse(requestCode.body)["token"]};
+}
+else {
+	return {"status":"failure","errorCode":"INVALID_AUTHENTICATION","errorDetail":"an error occured while fetching the authorization code."};	
+}

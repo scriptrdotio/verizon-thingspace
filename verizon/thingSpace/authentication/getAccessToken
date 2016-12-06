@@ -1,0 +1,7 @@
+var config = require("verizon/thingSpace/authentication/config");
+var tokenManager = require("verizon/thingSpace/authentication/TokenManager");
+var oauthToken = tokenManager.getAuthToken(storage.global[config.get("app") + "_" + config.get("username") + "_authCode"] );
+if(oauthToken.status == "success"){
+storage.global[config.get("app") + "_" + config.get("username")+ "_accountAccessToken"] =oauthToken.access_token ;
+}
+return oauthToken;

@@ -1,0 +1,11 @@
+// request a session token by passing the access token to login to the ThingSpace account.
+var sessionTokenManager = require("verizon/thingSpace/authentication/SessionTokenManager");
+var sessionToken = sessionTokenManager.getSessionToken();
+return sessionToken;
+if(sessionToken.status == "success"){
+  sessionTokenManager.saveToken(sessionToken.accessToken);
+  return {"status":"success","accessToken":sessionToken.accessToken};
+}
+else return {
+  status:"failure"
+};

@@ -1,0 +1,54 @@
+/*
+Activates service for one or more devices so that they can send and receive data. If the devices do not already exist in the account, this request adds them before activation.
+**params
+** devices (required) : array of deviceIds objects ,
+** kind,id (required) : object contains the type and value of the device identifier.
+** accountName (optional) : The name of a billing account.
+** servicePlan (required) : The service plan code that you want to assign to all specified devices. 
+** mdnZipCode (required) : the Zip code of the location where the line of service will primarily be used, or a Zip code that you have been told to use with these devices. For accounts that 							are configured for geographic numbering, this is the ZIP code from which the MDN will be derived.
+*/
+var devices = require("verizon-thingSpace/devices");
+var dto = {
+  "devices":[{
+    "deviceIds":[
+  		{
+ 		 "kind":"esn",
+  		"id":"09611822299"
+  		},
+            {  
+               "kind":"MEID",
+               "id":"A1000000000123"
+            }
+ 	 ]
+  }
+  ],
+  "accountName":"wissamassaf",
+  "servicePlan":"true",
+  "mdnZipCode":"98801",
+  "groupName":"g1"
+}
+
+
+var myDevice = new devices.Devices();
+//return myDevice.addDevices(dto);
+return myDevice.activateDevices(dto);
+myDevice.suspendDevices(dto);
+myDevice.restoreDevices(dto);
+//myDevice.RetreiveDeviceInfo(dto.devices[0].deviceIds[0]);
+//myDevice.RetrieveListOfServicePlans();
+//var d1 = [{"id": "89148000000842590078","kind":"iccid"}];
+//myDevice.changeDeviceIdentifier(d1,"4g","ChangeICCID");
+//return myDevice.changeDeviceServicePlans("3g");
+//var p1 = {"removeCostCenter":"true"}
+//return myDevice.changeDeviceCostCenter(p1);
+//return myDevice.changeDeviceCustomFields([{"key":"CustomField1","value":"valueC"},{"key":"CustomField2","value":"valueA"}]);
+//return myDevice.retrieveDeviceUsageHistory(dto.devices[0].deviceIds[0],"2015-09-16T00:00:01Z","2016-11-30T00:00:01Z");
+//return myDevice.retrieveDeviceConnectionHistory(dto.devices[0].deviceIds[0],"2015-09-16T00:00:01Z","2016-11-30T00:00:01Z");
+//return myDevice.retrieveDeviceProvisioningHistory(dto.devices[0].deviceIds[0],"2015-09-16T00:00:01Z","2016-11-30T00:00:01Z");
+//return myDevice.retrievePRLVersionFromDevices(dto.devices[0].deviceIds);
+//return myDevice.retrieveAggregatedDeviceUsageData(dto.devices[0].deviceIds,"2016-11-16T00:00:01Z","2016-11-30T00:00:01Z");
+//return myDevice.createDeviceGroup(dto.devices[0].deviceIds,"xyz","a random group");
+//return myDevice.retrieveListOfDeviceGroups(dto.accountName);
+//return myDevice.getInformationaboutDeviceGroup(dto.accountName,dto.groupName);
+//return myDevice.updateDeviceGroup(dto.accountName,dto.groupName,"zyx","another random group",dto.devices[0].deviceIds);
+//return myDevice.deleteDeviceGroup(dto.accountName,"zyx");

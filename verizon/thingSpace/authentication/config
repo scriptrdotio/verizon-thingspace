@@ -1,0 +1,88 @@
+ // The name of the app you need to connect to, e.g, 'Nest'
+var app = "ThingSpace";
+
+// OAuth 2.0: Authorization URI - step1 of OAuth process
+var authorizationUrl = "https://thingspace.verizon.com/developer/api/v1/auth/login"; 
+// OAuth 2.0: Authorization URI - step1 of OAuth process
+var accessTokenUrl = "https://thingspace.verizon.com/developer/api/v1/secure/apps/keysets/simtoken"; 
+
+//session url
+var sessionUrl = "https://thingspace.verizon.com/api/m2m/v1/session/login";
+
+//logout session url
+var logoutSessionUrl = "https://thingspace.verizon.com/api/m2m/v1/session/logout";
+//username
+ var username = "wissamassaf";//"YOUR_USERNAME"; //production
+//var client_id = "YOUR_SANDBOX_CLIENT_ID"; //sandbox;
+//YOUR ACCOUNT Access Token
+var accessToken="89ba225e1438e95bd05c3cc288d3591";
+// returns the value (access_token, username, app) 
+function get(value){
+  if(value == "accessToken"){
+	  return accessToken?accessToken:storage.global[app + "_" + username+ "_accountAccessToken"] ;
+  }
+  else if(value == "username"){
+    return username;
+  }
+  else if(value == "app"){
+    return app;
+  }
+  else return {"status":"failure","errorCode":"INVALID_VALUE","errorDetail":"an error occured while fetching the value ["+value+"]."}
+}
+
+//get the url to request the authorization code.
+function getAuthUrl() {
+  
+  return {
+
+    "url": authorizationUrl
+  }
+}	
+//get the url to request the the permanent access token.
+function getAccessTokenUrl(){
+  
+  return {
+    "url": accessTokenUrl
+  }
+}
+//get the url to request the session token.
+function getSessionUrl() {
+  
+  return {
+
+    "url": sessionUrl
+  }
+}	
+//get the url to logout or expire the session token.
+function getLogoutSessionUrl() {
+  
+  return {
+
+    "url": logoutSessionUrl
+  }
+}	
+function validateDevicesParams(dto){
+    if (!dto || !dto.accountName || !dto.devices || !dto.servicePlan || !dto.mdnZipCode || dto.devices.length == 0 ) {
+     return {
+       "status":"failure",
+      "errorCode": "Invalid_Parameter",
+      "errorDetail": "Devices along with (accountName,devices ,servicePlan ,mdnZipCode) cannot be null or empty"
+    };
+  }
+
+    if(dto.devices && dto.devices.length > 0){
+      for(var i =0; i<dto.devices.length; i++){
+    		if(dto.devices[i].deviceIds.length < 1){
+      			return {"status":"failure","errorCode":"MISSING_PARAMETER","errorDetail":"Each device must have deviceIds."};
+    		}
+   			else{
+      			for(var j= 0; j<dto.devices[i].deviceIds.length; j++){
+        			if(!dto.devices[i].deviceIds[j].kind || !dto.devices[i].deviceIds[j].id){
+          				return {"status":"failure","errorCode":"MISSING_PARAMETER","errorDetail":"Each device id must have at least one object contains kind and id."};
+          			}
+      			}
+   			 }
+  		}
+  	}
+  return dto;
+}

@@ -1,0 +1,739 @@
+ var config = require("verizon/thingSpace/authentication/config");
+var client = require("verizon/thingSpace/httpclient");
+var sessionTokenManager = require("verizon/thingSpace/authentication/SessionTokenManager");
+ 
+
+function Devices() {
+  this.sessionToken = sessionTokenManager.getPersistedTokens().accessToken;
+  this.httpClient = new client.HttpClient(config.get("username"));
+}
+
+/*
+description: Activates service for one or more devices so that they can send and receive data. If the devices do not already exist in the account, this request adds them before activation.
+
+dto : {
+  "accountName": "string",
+  "carrierIpPoolName": "string",
+  "carrierName": "string",
+  "costCenterCode": "string",
+  "customFields": [
+    {
+      "key": "string",
+      "value": "string"
+    }
+  ],
+  "devices": [
+    {
+      "deviceIds": [
+        {
+          "id": "string",
+          "kind": "string"
+        }
+      ]
+    }
+  ],
+  "groupName": "string",
+  "leadId": "string",
+  "mdnZipCode": "string",
+  "primaryPlaceOfUse": {
+    "address": {
+      "addressLine1": "string",
+      "addressLine2": "string",
+      "city": "string",
+      "country": "string",
+      "state": "string",
+      "zip": "string"
+    },
+    "customerName": {
+      "firstName": "string",
+      "lastName": "string",
+      "middleName": "string",
+      "title": "string"
+    }
+  },
+  "publicIpRestriction": "string",
+  "servicePlan": "string",
+  "skuNumber": "string"
+}
+*/
+Devices.prototype.activateDevices = function (dto){
+  var validation = config.validateDevicesParams(dto);
+  if(validation.status && validation.status == "failure"){
+    return validation;
+  }
+  var body = {
+    "accountName":dto.accountName,
+    "state":dto.state,
+    "devices":dto.devices,
+    "servicePlan":dto.servicePlan,
+    "mdnZipCode":dto.mdnZipCode,
+    "skuNumber":dto.skuNumber,
+    "customFields":dto.customFields,
+    "groupName":dto.groupName,
+    "this.leadId":dto.leadId,
+    "primaryPlaceOfUse":dto.primaryPlaceOfUse,
+    "publicIpRestriction":dto.publicIpRestriction
+  }
+    
+  var ActivateDevicesbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/actions/activate",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken,"content-type": "application/json"},
+    "method":"POST"
+  }
+  return this.httpClient.callApi(ActivateDevicesbody);
+  
+}
+
+/*
+description: Adds up to 200 new devices to an account, without activating lines of service for them. Use this resource if you want to manage some device settings before you are ready to activate service for the devices.
+
+NOTE: This is not a required or recommended step. You do not need to add devices to an account before activating them. Verizon recommends using /devices/actions/activate to add devices and activate service for them in a single step.
+
+body: {
+  "accountName": "string",
+  "customFields": [
+    {
+      "key": "string",
+      "value": "string"
+    }
+  ],
+  "devicesToAdd": [
+    {
+      "deviceIds": [
+        {
+          "id": "string",
+          "kind": "string"
+        }
+      ]
+    }
+  ],
+  "groupName": "string",
+  "skuNumber": "string",
+  "state": "string"
+}
+*/
+Devices.prototype.addDevices = function(dto){
+ var validation = config.validateDevicesParams(dto);
+  if(validation.status && validation.status == "failure"){
+    return validation;
+  }
+  var body = {
+    "devices":dto.devices,
+    "state":"Preactive",
+    "accountName":dto.accountName,
+    "groupName":dto.groupName,
+    "customFields":dto.customFields,
+    "skuNumber" : dto.skuNumber
+  }
+   var addDevicesbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/actions/add",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	}
+	return this.httpClient.callApi(addDevicesbody);
+}
+/*
+description: Suspends service for one or more devices.
+
+body: {
+  "accountName": "string",
+  "customFields": [
+    {
+      "key": "string",
+      "value": "string"
+    }
+  ],
+  "devices": [
+    {
+      "deviceIds": [
+        {
+          "id": "string",
+          "kind": "string"
+        }
+      ]
+    }
+  ],
+  "groupName": "string",
+  "servicePlan": "string"
+}
+*/
+Devices.prototype.suspendDevices = function(dto){
+ var validation = config.validateDevicesParams(dto);
+  if(validation.status && validation.status == "failure"){
+    return validation;
+  }
+   var body = {
+    "devices":dto.devices,
+    "accountName":dto.accountName,
+    "groupName":dto.groupName,
+    "customFields":dto.customFields
+  }
+   var suspendDevicesbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/actions/suspend",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	}
+	return this.httpClient.callApi(suspendDevicesbody);
+}
+/*
+description: Restores service to one or more suspended devices.
+
+Parameters: {
+  "accountName": "string",
+  "customFields": [
+    {
+      "key": "string",
+      "value": "string"
+    }
+  ],
+  "devices": [
+    {
+      "deviceIds": [
+        {
+          "id": "string",
+          "kind": "string"
+        }
+      ]
+    }
+  ],
+  "groupName": "string",
+  "servicePlan": "string"
+}
+*/
+Devices.prototype.restoreDevices = function(dto){
+    var validation = config.validateDevicesParams(dto);
+  if(validation.status && validation.status == "failure"){
+    return validation;
+  }var body = {
+    "devices":dto.devices,
+    "accountName":dto.accountName,
+    "groupName":dto.groupName,
+    "customFields":dto.customFields
+   }
+   var restoreDevicesbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/actions/restore",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	}
+	return this.httpClient.callApi(restoreDevicesbody);
+}
+/*
+description: Deactivates service for one or more devices.
+
+NOTE: Deactivating service for a device may result in an early termination fee (ETF) being charged to the account, depending on the terms of the contract with Verizon. If your contract allows ETF waivers and if you want to use one for a particular deactivation, set the EtfWaiver value to True.
+
+body: {
+  "accountName": "string",
+  "customFields": [
+    {
+      "key": "string",
+      "value": "string"
+    }
+  ],
+  "devices": [
+    {
+      "deviceIds": [
+        {
+          "id": "string",
+          "kind": "string"
+        }
+      ]
+    }
+  ],
+  "etfWaiver": true,
+  "groupName": "string",
+  "reasonCode": "string",
+  "servicePlan": "string"
+}
+*/
+Devices.prototype.deactivateDevices = function(dto){
+  var validation = config.validateDevicesParams(dto);
+  if(validation.status && validation.status == "failure"){
+    return validation;
+  }var body = {
+    "devices":dto.devices,
+    "accountName":dto.accountName,
+    "groupName":dto.groupName,
+    "customFields":dto.customFields ,
+   "reasonCode":dto.reasonCode? dto.reasonCode :"FF"
+  }
+   var deactivateDevicesbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/actions/deactivate",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	}
+	return this.httpClient.callApi(deactivateDevicesbody);
+}
+//description: Returns information about one or more devices, including provisioning state, service plan, MDN, MIN, and IP address.
+/*{
+  "accountName": "string",
+  "currentState": "string",
+  "customFields": [
+    {
+      "key": "string",
+      "value": "string"
+    }
+  ],
+  "deviceId": {
+    "id": "string",
+    "kind": "string"
+  },
+  "earliest": "string",
+  "groupName": "string",
+  "latest": "string",
+  "servicePlan": "string"
+}
+
+*/
+Devices.prototype.RetreiveDevicesInfo = function(dto){
+  var validation = config.validateDevicesParams(dto);
+  if(validation.status && validation.status == "failure"){
+    return validation;
+  }
+   var body = {
+    "accountName":dto.accountName,
+    "currentState":dto.currentState,
+    "deviceId":dto.deviceId,
+    "customFields":dto.customFields,
+     "earliest":dto.earliest,
+     "groupName":dto.groupName,
+     "latest":dto.latest,
+     "servicePlan":dto.servicePlan
+  }
+   var RetreiveDevicesInfobody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/actions/list",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	} 
+	return this.httpClient.callApi(RetreiveDevicesInfobody);
+}
+//description: Changes the identifier of a 3G or 4G device to match hardware changes made for a line of service. Use this request to transfer the line of service and the MDN to new hardware, or to change the MDN.
+/*Parameters:
+
+dto:{
+  "assignNonGeoMdn": true,
+  "serviceType":"string"
+ "npaNxx": "string",
+  "servicePlan": "string",
+  "zipCode": "string"
+
+"deviceIds": [
+    {
+      "id": "string",
+      "kind": "string"
+    }
+  ],
+   "change4gOption": "string",
+}  
+*/
+Devices.prototype.changeDevicesIdentifier = function(dto){
+	if(!serviceType){
+      return {"status":"failure","errorCode":"MISSING_PARAMETER","errorDetail":"serviceType is required."};
+    }
+   
+   var body = {
+    "deviceIds":dto.deviceId,
+    "deviceIdsTo":dto.deviceId,
+    "change4gOption":dto.change4gOption,
+    "zipCode":dto.mdnZipCode,
+     "servicePlan":dto.servicePlan
+  }
+  // return body;
+   var changeDevicesIdentifierbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/"+dto.serviceType+"/actions/deviceId",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"PUT"
+  	}
+   return this.httpClient.callApi(changeDevicesIdentifierbody);
+}
+//description: Changes the service plan for one or more devices.
+/*Parameters:
+{
+  "accountName": "string",
+  "currentServicePlan": "string",
+  "customFields": [
+    {
+      "key": "string",
+      "value": "string"
+    }
+  ],
+  "devices": [
+    {
+      "deviceIds": [
+        {
+          "id": "string",
+          "kind": "string"
+        }
+      ]
+    }
+  ],
+  "groupName": "string",
+  "servicePlan": "string"
+}
+*/
+Devices.prototype.changeDevicesServicePlans = function(dto){
+   var body = {
+    "devices":dto.devices,
+    "accountName":dto.accountName,
+    "groupName":dto.groupName,
+    "currentServicePlan":dto.currentServicePlan ,
+    "customFields":dto.customFields,
+    "servicePlan": dto.servicePlan
+  };
+   var changeDevicesServicePlansbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/actions/plan",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"PUT"
+  	}
+	return this.httpClient.callApi(changeDevicesServicePlansbody);
+}
+//description: Changes or removes the CostCenterCode value for one or more devices.
+/*Parameters:{
+ "devices": [
+    	{
+      		"deviceIds": [
+        		{
+          			"id": "string",
+          			"kind": "string"
+        		}
+      		]
+    	}
+	]
+	"costCenter":"string",
+    "removeCostCenter":"string"
+}
+*/
+Devices.prototype.changeDevicesCostCenter = function(dto){
+   var body = {
+    "devices":dto.devices,
+  };
+  if(dto.costCenter){
+    body["costCenter"] = dto.costCenter;
+  }
+    if(removeCostCenter){
+    body["removeCostCenter"] = dto.removeCostCenter;
+  }
+   var changeDevicesServicePlansbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/costCenter",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"PUT"
+  	}
+	return this.httpClient.callApi(changeDevicesServicePlansbody);
+}
+//description: Assign or change custom field values for one or more devices. You can use custom fields to make it easier to manage and report on devices. The ThingSpace Platform sends a CarrierService callback message for each device in the request when the custom fields have been changed, or if there was a problem and the change could not be completed.
+/*Parameters:{
+  
+  "accountName": "string",
+  "customFields": [
+    {
+      "key": "string",
+      "value": "string"
+    }
+  ],
+  "customFieldsToUpdate": [
+    {
+      "key": "string",
+      "value": "string"
+    }
+  ],
+  "devices": [
+    {
+      "deviceIds": [
+        {
+          "id": "string",
+          "kind": "string"
+        }
+      ]
+    }
+  ],
+  "groupName": "string",
+  "servicePlan": "string"
+}
+*/
+Devices.prototype.changeDevicesCustomFields = function(dto){
+ var body = {
+    "devices":dto.devices,
+    "accountName":dto.accountName,
+    "groupName":dto.groupName,
+    "servicePlan":dto.servicePlan,
+    "customFields":dto.customFields,
+     "customFieldsToUpdate":dto.customFieldsToUpdate
+  };
+
+   var changeDevicesCustomFieldsbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/actions/customFields",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"PUT"
+  	}
+//  return changeDevicesCustomFieldsbody;
+	return this.httpClient.callApi(changeDevicesCustomFieldsbody);
+}
+//description: Returns the daily network data usage of a single device during a specified time period.
+/*Parameters:
+ {
+  "deviceId": {
+    "id": "string",
+    "kind": "string"
+  },
+  "earliest": "string",
+  "latest": "string"
+}
+*/
+Devices.prototype.retrieveDevicesUsageHistory = function(dto){
+  var body = {
+    "deviceId":dto.deviceId,
+    "earliest":dto.earliest,
+    "latest":dto.latest
+  };
+
+   var retrieveDevicesUsageHistorybody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/usage/actions/list",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	}
+	return this.httpClient.callApi(retrieveDevicesUsageHistorybody);
+}
+//description: Returns a list of network connection events for a device during a specified time period.
+/*Parameters:
+ {
+  "deviceId": {
+    "id": "string",
+    "kind": "string"
+  },
+  "earliest": "string",
+  "latest": "string"
+}
+*/
+Devices.prototype.retrieveDevicesConnectionHistory = function(dto){
+ var body = {
+    "deviceId":dto.deviceId,
+    "earliest":dto.earliest,
+    "latest":dto.latest
+  };
+
+   var retrieveDevicesConnectionHistorybody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/connections/actions/listHistory",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	}
+	return this.httpClient.callApi(retrieveDevicesConnectionHistorybody);
+}
+//description: Returns the provisioning history of a specified device during a specified time period.
+/*Parameters:
+ {
+  "deviceId": {
+    "id": "string",
+    "kind": "string"
+  },
+  "earliest": "string",
+  "latest": "string"
+}
+*/
+Devices.prototype.retrieveDevicesProvisioningHistory = function(dto){
+ var body = {
+    "deviceId":dto.deviceId,
+    "earliest":dto.earliest,
+    "latest":dto.latest
+  };
+
+   var retrieveDevicesProvisioningHistorybody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/history/actions/list",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	}
+	return this.httpClient.callApi(retrieveDevicesProvisioningHistorybody);
+}
+//description: Requests the current PRL (Preferred Roaming List) version for 2G or 3G devices, which can help determine which devices need a PRL update. (4G and GSM devices do not have a PRL.)
+/*Parameters:
+{
+  "deviceIds": [
+    {
+      "id": "string",
+      "kind": "string"
+    }
+  ]
+}
+*/
+Devices.prototype.retrievePRLVersionFromDevices = function(dto){
+  var body = {
+    "deviceIds":dto.deviceIds,
+  };
+
+   var retrievePRLVersionFromDevicesbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/prl/actions/list",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	}
+	return this.httpClient.callApi(retrievePRLVersionFromDevicesbody);
+}
+//description: Returns the total amount of data sent and the total number of SMS messages sent or received by a set of devices in a specified timeframe. The information is returned in a callback response, so you must register a URL for DevicesUsage callback messages.
+/*Parameters:
+{
+  "accountName": "string",
+  "deviceIds": [
+    {
+      "id": "string",
+      "kind": "string"
+    }
+  ],
+  "endTime": "string",
+  "groupName": "string",
+  "startTime": "string"
+}
+*/
+Devices.prototype.retrieveAggregatedDevicesUsageData = function(dto){
+
+   var body = {
+    "accountName":dto.accountName,
+    "deviceIds":dto.deviceIds,
+    "groupName":dto.groupName,
+    "endTime": dto.endTime,
+    "startTime": dto.startTime
+  };
+
+   var retrieveAggregatedDevicesUsageDatabody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/devices/usage/actions/list/aggregate",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	}
+	return this.httpClient.callApi(retrieveAggregatedDevicesUsageDatabody);
+}
+//description: Returns a list of all data service plans that are associated with a specified billing account. When you send a request to /devices/actions/activate to activate a line of service you must specify the code for one of the service plans associated with your account.
+/*Parameters:
+{
+  "accountName": "string",
+}
+*/
+Devices.prototype.RetrieveListOfServicePlans = function(dto){
+
+ 
+   var RetrieveAListOfServicePlansbody = {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/plans/"+dto.accountName,
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"GET"
+  	}
+	return this.httpClient.callApi(RetrieveAListOfServicePlansbody);
+}
+//description: Create a new device group and optionally add devices to the group. Devices groups can make it easier to manage similar devices and to get reports on their usage.
+/*Parameters:
+{
+  "accountName": "string",
+  "devicesToAdd": [
+    {
+      "id": "string",
+      "kind": "string"
+    }
+  ],
+  "groupDescription": "string",
+  "groupName": "string"
+}
+
+
+*/
+Devices.prototype.createDevicesGroup = function(dto){
+
+  var body =  {
+    "accountName":dto.accountName,
+    "devicesToAdd":dto.devicesToAdd,
+    "groupName":dto.group,
+    "groupDescription":dto.groupDescription
+  };
+  var createDevicesGroupbody= {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/groups",
+    "bodyString":JSON.stringify(body),
+    "headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"POST"
+  	};
+	return this.httpClient.callApi(createDevicesGroupbody);
+}
+//description: Returns a list of all device groups in a specified account.
+/*Parameters:
+{
+"accountName":string
+}
+*/
+Devices.prototype.retrieveListOfDevicesGroups = function(dto){
+
+  var retrieveListOfDevicesGroupsbody= {
+    "url":"https://thingspace.verizon.com/api/m2m/v1/groups/"+dto.accountName,
+    "headers":{"Authorization":" Bearer "+config.get('accessToken'),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    "method":"GET"
+  };
+	return this.httpClient.callApi(retrieveListOfDevicesGroupsbody);
+}
+//description: Returns the name, description, and list of devices in a device group..
+/*Parameters:
+{
+"accountName":string,
+"groupName":string
+}
+*/
+Devices.prototype.getInformationaboutDevicesGroup = function(dto){
+
+  var getInformationaboutDevicesGroupbody=  {
+          	"url":"https://thingspace.verizon.com/api/m2m/v1/groups/"+dto.accountName+"/name/"+dto.groupName,
+    		"headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+   			"method":"GET"
+  		};
+	return this.httpClient.callApi(getInformationaboutDevicesGroupbody);
+}
+//description: Make changes to a device group, including changing the name and description, and adding or removing devices.
+/*Parameters:
+{
+"accountName":string,
+"groupName":string,
+"newGroupName":string,
+"groupDescription":string,
+"devicesToAdd": [
+    {
+      "id": "string",
+      "kind": "string"
+    }
+  ]
+}
+*/
+Devices.prototype.updateDevicesGroup = function(dto){
+  var body = {
+    "newGroupName":dto.newGroupName,
+	"groupDescription":dto.groupDescription,
+	"devicesToAdd":dto.devicesToAdd 
+  };
+  var updateDevicesGroupbody=   {
+          	"url":"https://thingspace.verizon.com/api/m2m/v1/groups/"+dto.accountName+"/name/"+dto.groupName,
+    		"headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+    		"bodyString":JSON.stringify(body),
+   			"method":"PUT"
+  		};
+	return this.httpClient.callApi(updateDevicesGroupbody);
+}
+//description: Deletes a device group from the account. Devices in the group are moved to the default device group and are not deleted from the account.
+/*Parameters:
+{
+"accountName":string,
+"groupName":string
+}
+*/
+Devices.prototype.deleteDevicesGroup = function(dto){
+
+  var deleteDevicesGroupbody = {
+          	"url":"https://thingspace.verizon.com/api/m2m/v1/groups/"+dto.accountName+"/name/"+dto.groupName,
+    		"headers":{"Authorization":" Bearer "+config.get("accessToken"),"VZ-M2M-Token":this.sessionToken, "content-type": "application/json"},
+   			"method":"DELETE"
+  		};
+	return this.httpClient.callApi(deleteDevicesGroupbody);
+}

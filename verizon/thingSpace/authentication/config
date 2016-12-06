@@ -12,10 +12,10 @@ var sessionUrl = "https://thingspace.verizon.com/api/m2m/v1/session/login";
 //logout session url
 var logoutSessionUrl = "https://thingspace.verizon.com/api/m2m/v1/session/logout";
 //username
- var username = "wissamassaf";//"YOUR_USERNAME"; //production
+ var username = "YOUR_THINGSPACE_USERNAME";//"YOUR_USERNAME"; //production
 //var client_id = "YOUR_SANDBOX_CLIENT_ID"; //sandbox;
 //YOUR ACCOUNT Access Token
-var accessToken="89ba225e1438e95bd05c3cc288d3591";
+var accessToken="";
 // returns the value (access_token, username, app) 
 function get(value){
   if(value == "accessToken"){

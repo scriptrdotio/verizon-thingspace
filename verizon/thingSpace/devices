@@ -737,3 +737,92 @@ Devices.prototype.deleteDevicesGroup = function(dto){
   		};
 	return this.httpClient.callApi(deleteDevicesGroupbody);
 }
+/*
+description: Each dweet from a device or application must contain all data that the device is capable of sending. For example, if a car is monitoring speed, engine 			RPM, and oil pressure, each dweet must contain all three measurements, instead of three separate dweets that each contain only one measurement.
+			Dweets cannot be more than 2,000 characters.
+deviceId : string
+dto : {key:value};
+*/
+Devices.prototype.postDweet = function (deviceId, dto){
+  if(!deviceId){
+    return {"status":"failure","errorCode":"MISSING_PARAMETER","errorDetail":"deviceId is required to dweet."};
+  }
+  else if(dto){
+    dto = JSON.stringify(dto);
+    if(dto.length > 2000){
+      return {"status":"failure","errorCode":"MAX_LENGTH","errorDetail":"The request body cannot be more than 2,000 characters."};
+    }
+    dto = JSON.parse(dto);
+  }
+  dto = dto?dto:{};
+  var postDweetbody = {
+          	"url":"https://thingspace.io/dweet/for/"+deviceId,
+    		"method":"POST",
+    		"body":JSON.stringify({"params":dto})
+  		};
+	return this.httpClient.callApi(postDweetbody);
+}
+/*
+description: Use a GET request to send data from a device or application to ThingSpace.io, with the data as query parameters in the request.
+			The data will be stored for 24 hours (maximum of 500 messages per thing)
+			Your application can listen continuously for data from things, or it can retrieve the latest data.
+			Devices can listen continuously for messages from your application, or they can retrieve the latest messages.
+			Data can be displayed in a freeboard.
+deviceId : string
+dto : {key:value};
+*/
+Devices.prototype.getDweet = function (deviceId, dto){
+   if(!deviceId){
+    return {"status":"failure","errorCode":"MISSING_PARAMETER","errorDetail":"deviceId is required to dweet."};
+  }
+  var params = "?";
+  dto = dto?dto:{};
+  for (var key in dto){
+    params = params+key+"="+dto[key]+"&";
+  }
+  var getDweetbody = {
+          	"url":"https://thingspace.io/dweet/for/"+deviceId+params.substring(0,params.length-1),
+    		"method":"GET",
+    		"body":JSON.stringify({"params":dto})
+  		};
+	return this.httpClient.callApi(getDweetbody);
+}
+/*
+description : Retrieve the most recent message sent by a device or application.
+deviceId : string
+*/
+Devices.prototype.getLatestDweets = function (deviceId){
+  if(!deviceId){
+    return {"status":"failure","errorCode":"MISSING_PARAMETER","errorDetail":"deviceId is required to dweet."};
+  }
+  var latestDweetsbody = {
+          	"url":"https://thingspace.io/get/latest/dweet/for/"+deviceId,
+    		"method":"GET"
+  		};
+	return this.httpClient.callApi(latestDweetsbody);
+}
+
+Devices.prototype.getCachedDweets = function (deviceId){
+  if(!deviceId){
+    return {"status":"failure","errorCode":"MISSING_PARAMETER","errorDetail":"deviceId is required to dweet."};
+  }
+  var cachedDweetsbody = {
+          	"url":"https://thingspace.io/get/dweets/for/"+deviceId,
+    		"method":"GET"
+  		};
+	return this.httpClient.callApi(cachedDweetsbody);
+}
+/*
+description : Retrieve the most recent messages sent by a device or application in the last 24 hours, up to 500 messages. The most recent message is returned first.
+deviceId : string
+*/
+Devices.prototype.getCachedDweets = function (deviceId){
+  if(!deviceId){
+    return {"status":"failure","errorCode":"MISSING_PARAMETER","errorDetail":"deviceId is required to dweet."};
+  }
+  var cachedDweetsbody = {
+          	"url":"https://thingspace.io/get/dweets/for/"+deviceId,
+    		"method":"GET"
+  		};
+	return this.httpClient.callApi(cachedDweetsbody);
+}

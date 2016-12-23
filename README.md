@@ -1,6 +1,6 @@
 ## About ThingSpace
 
-[ThingSpace](https://thingspace.verizon.com/developer/)ThingSpace is your gateway to a simplified IoT workspace for prototype through production. You have 24x7 access through a single, consolidated portal to everything you need to bring your IoT solutions to life, and to market.
+[ThingSpace](https://thingspace.verizon.com/developer/) is your gateway to a simplified IoT workspace for prototype through production. You have 24x7 access through a single, consolidated portal to everything you need to bring your IoT solutions to life, and to market.
 
 ## Purpose of the scriptr.io connector for ThingSpace
 The purpose of this connector is to simplify and streamline the way you access ThingSpace' APIs from scriptr.io, by providing you with a few native objects that you can directly integrate into your own scripts. This will hopefully allow you to create sophisticated connected devices. 
@@ -58,25 +58,29 @@ var myDevice = new deviceModule.Device();
 ```
 The Device class provides many methods to obtain data , such as:
 ```
-myDevice.addDevices({"accountName":"string","carrierIpPoolName":"string","carrierName":"string","costCenterCode":"string","customFields":[{"key":"string","value":"string"}],"devices":[{"deviceIds":[{"id":"string","kind":"string"}]}],"groupName":"string","leadId":"string","mdnZipCode":"string","primaryPlaceOfUse":{"address":{"addressLine1":"string","addressLine2":"string","city":"string","country":"string","state":"string","zip":"string"},"customerName":{"firstName":"string","lastName":"string","middleName":"string","title":"string"}},"publicIpRestriction":"string","servicePlan":"string","skuNumber":"string"});
-myDevice.activateDevices({ "accountName": "string", "customFields": [ { "key": "string", "value": "string" } ], "devicesToAdd": [ { "deviceIds": [ { "id": "string", "kind": "string" } ] } ], "groupName": "string", "skuNumber": "string", "state": "string" });
-myDevice.suspendDevices({ "accountName": "string", "customFields": [ { "key": "string", "value": "string" } ], "devices": [ { "deviceIds": [ { "id": "string", "kind": "string" } ] } ], "groupName": "string", "servicePlan": "string" });
-myDevice.restoreDevices({ "accountName": "string", "customFields": [ { "key": "string", "value": "string" } ], "devices": [ { "deviceIds": [ { "id": "string", "kind": "string" } ] } ], "groupName": "string", "servicePlan": "string" });
-myDevice.RetreiveDeviceInfo({ "accountName": "string", "customFields": [ { "key": "string", "value": "string" } ], "devices": [ { "deviceIds": [ { "id": "string", "kind": "string" } ] } ], "etfWaiver": true, "groupName": "string", "reasonCode": "string", "servicePlan": "string" });
-myDevice.RetrieveListOfServicePlans({"accountName": "string"});
-myDevice.changeDeviceIdentifier({ "assignNonGeoMdn": true, "serviceType":"string" "npaNxx": "string", "servicePlan": "string", "zipCode": "string" "deviceIds": [ { "id": "string", "kind": "string" } ], "change4gOption": "string"} );
-myDevice.changeDeviceServicePlans({ "accountName": "string", "currentServicePlan": "string", "customFields": [ { "key": "string", "value": "string" } ], "devices": [ { "deviceIds": [ { "id": "string", "kind": "string" } ] } ], "groupName": "string", "servicePlan": "string" });
-myDevice.changeDeviceCostCenter({ "devices": [ { "deviceIds": [ { "id": "string", "kind": "string" } ] } ] "costCenter":"string", "removeCostCenter":"string" });
-myDevice.changeDeviceCustomFields({ "accountName": "string", "customFields": [ { "key": "string", "value": "string" } ], "customFieldsToUpdate": [ { "key": "string", "value": "string" } ], "devices": [ { "deviceIds": [ { "id": "string", "kind": "string" } ] } ], "groupName": "string", "servicePlan": "string" });
-myDevice.retrieveDeviceUsageHistory( { "deviceId": { "id": "string", "kind": "string" }, "earliest": "string", "latest": "string" });
-myDevice.retrieveDeviceConnectionHistory( { "deviceId": { "id": "string", "kind": "string" }, "earliest": "string", "latest": "string" });
-myDevice.retrieveDeviceProvisioningHistory( { "deviceId": { "id": "string", "kind": "string" }, "earliest": "string", "latest": "string" });
-myDevice.retrievePRLVersionFromDevices({ "deviceIds": [ { "id": "string", "kind": "string" } ] });
-myDevice.retrieveAggregatedDeviceUsageData({ "accountName": "string", "deviceIds": [ { "id": "string", "kind": "string" } ], "endTime": "string", "groupName": "string", "startTime": "string" });
-myDevice.createDeviceGroup({ "accountName": "string", "devicesToAdd": [ { "id": "string", "kind": "string" } ], "groupDescription": "string", "groupName": "string" });
-myDevice.retrieveListOfDeviceGroups({"accountName":string});
-myDevice.getInformationaboutDeviceGroup({ "accountName":string, "groupName":string });
-myDevice.updateDeviceGroup({ "accountName":string, "groupName":string, "newGroupName":string, "groupDescription":string, "devicesToAdd": [ { "id": "string", "kind": "string" } ] });
-myDevice.deleteDeviceGroup({ "accountName":string, "groupName":string });
+myDevice.addDevices();
+myDevice.activateDevices();
+myDevice.suspendDevices();
+myDevice.restoreDevices();
+myDevice.RetreiveDeviceInfo();
+myDevice.postDweet();
+myDevice.getDweet();
+myDevice.getLatestDweet();
+myDevice.getCachedDweets();
+myDevice.RetrieveListOfServicePlans();
+myDevice.changeDeviceIdentifier();
+myDevice.changeDeviceServicePlans();
+myDevice.changeDeviceCostCenter();
+myDevice.changeDeviceCustomFields();
+myDevice.retrieveDeviceUsageHistory();
+myDevice.retrieveDeviceConnectionHistory();
+myDevice.retrieveDeviceProvisioningHistory);
+myDevice.retrievePRLVersionFromDevices();
+myDevice.retrieveAggregatedDeviceUsageData();
+myDevice.createDeviceGroup();
+myDevice.retrieveListOfDeviceGroups();
+myDevice.getInformationaboutDeviceGroup();
+myDevice.updateDeviceGroup();
+myDevice.deleteDeviceGroup();
 
 ```
